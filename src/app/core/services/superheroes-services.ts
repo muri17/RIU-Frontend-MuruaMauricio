@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { Superheroe } from '../../shared/models/superheroe';
-import { delay, Observable, of } from 'rxjs';
+import { delay, Observable, of, throwError } from 'rxjs';
 
 //Simular latencia del backend
 const DELAY_MS = 400;
@@ -89,6 +89,14 @@ export class SuperheroesServices {
       return of(this._superheroes().map(h => ({ ...h }))).pipe(delay(DELAY_MS));
   }
 
+  //Consultar un superheroe por su id
+  getById(id: number): Observable<Superheroe> {
+    const hero = this._superheroes().find(h => h.id === id);
+    return hero
+      ? of({ ...hero }).pipe(delay(DELAY_MS))
+      : throwError(() => new Error(`Superhéroe con id "${id}" no encontrado`));
+  }
+
   //Crear un nuevo superheroe
   create(dto: Superheroe): Observable<Superheroe> {
     const hero: Superheroe = {
@@ -98,6 +106,28 @@ export class SuperheroesServices {
     };
     this._superheroes.update(list => [...list, hero]);
     return of({ ...hero }).pipe(delay(DELAY_MS));
+  }
+
+  //Actualizar un superheroe existente
+   update(id: number, dto: Superheroe): Observable<Superheroe> {
+    const index = this._superheroes().findIndex(h => h.id === id);
+    if (index === -1) {
+      return throwError(() => new Error(`Superhéroe con id "${id}" no encontrado`));
+    }
+
+    let updated!: Superheroe;
+    this._superheroes.update(list => {
+      const copy = [...list];
+      copy[index] = {
+        ...copy[index],
+        ...dto,
+        name: dto.name ? dto.name.toUpperCase() : copy[index].name,
+      };
+      updated = { ...copy[index] };
+      return copy;
+    });
+
+    return of(updated).pipe(delay(DELAY_MS));
   }
 }
 
