@@ -19,6 +19,9 @@ import { Subject } from 'rxjs';
 
 import { SuperheroesServices } from '../../../../core/services/superheroes-services';
 import { Superheroe } from '../../../../shared/models/superheroe';
+import { SuperheroeDeleteDialogComponent } from '../superheroe-delete-dialog/superheroe-delete-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 @Component({
@@ -42,12 +45,15 @@ import { Superheroe } from '../../../../shared/models/superheroe';
 export class SuperheroeListComponent implements OnInit, OnDestroy {
   private readonly heroesService = inject(SuperheroesServices);
   private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
 
   private readonly destroy$ = new Subject<void>();
 
   readonly dataSource = new MatTableDataSource<Superheroe>();
   readonly displayedColumns = ['name', 'realName', 'universe', 'year', 'actions'];
   readonly defaultImg = 'assets/images/hero-placeholder.svg';
+
 
   onImgError(event: Event): void {
     (event.target as HTMLImageElement).src = this.defaultImg;
@@ -80,6 +86,30 @@ export class SuperheroeListComponent implements OnInit, OnDestroy {
 
   navigateToDetail(heroe: Superheroe): void {
     this.router.navigate(['/superheroes/detail', heroe.id]);
+  }
+
+  openDeleteDialog(hero: Superheroe): void {
+    const ref = this.dialog.open(SuperheroeDeleteDialogComponent, {
+      data: { heroName: hero.name },
+      width: '380px',
+    });
+
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+
+      this.heroesService
+        .delete(hero.id)
+        .subscribe({
+          next: () => {
+            this.snackBar.open(`${hero.name} eliminado`, 'OK', { duration: 2500 });
+            this.loadHeroes();
+          },
+          error: (err: Error) =>
+            this.snackBar.open(err.message ?? 'Error al eliminar', 'Cerrar', {
+              duration: 4000,
+            }),
+        });
+    });
   }
 }
 
