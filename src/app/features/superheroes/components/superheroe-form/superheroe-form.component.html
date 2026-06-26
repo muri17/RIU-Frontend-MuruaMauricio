@@ -2,8 +2,8 @@
   <mat-card class="form-card">
     <mat-card-header>
       <mat-card-title>
-        <mat-icon>add_circle</mat-icon>
-        Nuevo héroe
+        <mat-icon>{{ isViewMode() ? 'visibility' : 'add_circle' }}</mat-icon>
+        {{ isViewMode() ? 'Detalle héroe' : 'Nuevo héroe' }}
       </mat-card-title>
     </mat-card-header>
 
@@ -74,12 +74,14 @@
         <div class="form-actions">
           <button mat-stroked-button type="button" (click)="goBack()">
             <mat-icon>arrow_back</mat-icon>
-            Cancelar
+            {{ isViewMode() ? 'Volver' : 'Cancelar' }}
           </button>
-          <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
-            <mat-icon>add</mat-icon>
-            Crear héroe
-          </button>
+          @if (!isViewMode()) {
+            <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
+              <mat-icon>add</mat-icon>
+              Crear héroe
+            </button>
+          }
         </div>
       </form>
     </mat-card-content>

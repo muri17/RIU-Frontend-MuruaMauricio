@@ -25,6 +25,14 @@ export const routes: Routes = [
           ).then(m => m.SuperheroeFormComponent),
         title: 'Nuevo héroe',
       },
+      {
+        path: 'detail/:id',
+        loadComponent: () =>
+          import(
+            './features/superheroes/components/superheroe-form/superheroe-form.component'
+          ).then(m => m.SuperheroeFormComponent),
+        title: 'Detalle héroe',
+      },
     ],
   },
   {

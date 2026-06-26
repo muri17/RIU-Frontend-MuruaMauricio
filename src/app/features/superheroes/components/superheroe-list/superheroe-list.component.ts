@@ -46,7 +46,7 @@ export class SuperheroeListComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
 
   readonly dataSource = new MatTableDataSource<Superheroe>();
-  readonly displayedColumns = ['name', 'realName', 'universe', 'year'];
+  readonly displayedColumns = ['name', 'realName', 'universe', 'year', 'actions'];
   readonly defaultImg = 'assets/images/hero-placeholder.svg';
 
   onImgError(event: Event): void {
@@ -73,4 +73,9 @@ export class SuperheroeListComponent implements OnInit, OnDestroy {
   navigateToCreate(): void {
     this.router.navigate(['/superheroes/new']);
   }
+
+  navigateToDetail(heroe: Superheroe): void {
+    this.router.navigate(['/superheroes/detail', heroe.id]);
+  }
 }
+

@@ -3,8 +3,9 @@ import {
   Component,
   OnInit,
   inject,
+  signal,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   FormBuilder,
   FormGroup,
@@ -43,13 +44,24 @@ export class SuperheroeFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly heroesService = inject(SuperheroesServices);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly route = inject(ActivatedRoute);
 
   readonly universe = ['Marvel', 'DC', 'Other'] as const;
+
+  readonly isViewMode = signal(false);
 
   form!: FormGroup;
 
   ngOnInit(): void {
     this.buildForm();
+
+    const id = this.route.snapshot.paramMap.get('id');
+    const path = this.route.snapshot.routeConfig?.path ?? '';
+
+    if (id && path.startsWith('detail')) {
+      this.isViewMode.set(true);
+      this.loadHeroe(Number.parseInt(id));
+    }
   }
 
   private buildForm(): void {
@@ -66,16 +78,37 @@ export class SuperheroeFormComponent implements OnInit {
     });
   }
 
+  private loadHeroe(id: number): void {
+    this.heroesService
+      .getById(id)
+      .subscribe({
+        next: hero => {
+          this.form.patchValue({
+            ...hero,
+            powers: hero.powers.join(', '),
+          });
+          if (this.isViewMode()) this.form.disable();
+        },
+        error: () => {
+          this.snackBar.open('Héroe no encontrado', 'Cerrar', { duration: 3000 });
+          this.goBack();
+        },
+      });
+  }
+
   onSubmit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
     const raw = this.form.getRawValue();
     const powers: string[] = raw.powers
       .split(',')
       .map((p: string) => p.trim())
       .filter(Boolean);
 
-    const dto = { ...raw, powers };
-
-    this.heroesService.create(dto).subscribe({
+    this.heroesService.create({ ...raw, powers }).subscribe({
       next: () => {
         this.snackBar.open('Héroe creado ✓', 'OK', { duration: 2500 });
         this.goBack();
@@ -85,6 +118,20 @@ export class SuperheroeFormComponent implements OnInit {
           duration: 4000,
         }),
     });
+  }
+
+  get nameError(): string {
+    const c = this.form.get('name');
+    if (c?.hasError('required')) return 'El nombre es obligatorio';
+    if (c?.hasError('minlength')) return 'Mínimo 2 caracteres';
+    return '';
+  }
+
+  get yearError(): string {
+    const c = this.form.get('year');
+    if (c?.hasError('required')) return 'El año es obligatorio';
+    if (c?.hasError('pattern')) return 'Debe ser un año de 4 dígitos (ej: 1962)';
+    return '';
   }
 
   goBack(): void {
