@@ -54,7 +54,7 @@ const SEED_HEROES: Superheroe[] = [
     },
     {
       id: 6,
-      name: 'CAPTAIN AMERICA',
+      name: 'CAPITAN AMERICA',
       realName: 'Steve Rogers',
       universe: 'Marvel',
       powers: ['Superfuerza aumentada', 'Escudo de vibranium', 'Agilidad'],
@@ -81,9 +81,23 @@ export class SuperheroesServices {
   //Almacenamiento en memoria reactivo
   private readonly _superheroes = signal<Superheroe[]>(SEED_HEROES);
 
+  //Variable para generar IDs únicos para nuevos héroes
+  private _nextId = SEED_HEROES.length + 1;
+
   //Consultar todos los superheroes
   getAll(): Observable<Superheroe[]> {
       return of(this._superheroes().map(h => ({ ...h }))).pipe(delay(DELAY_MS));
+  }
+
+  //Crear un nuevo superheroe
+  create(dto: Superheroe): Observable<Superheroe> {
+    const hero: Superheroe = {
+      ...dto,
+      id: this._nextId++,
+      name: dto.name.toUpperCase(),
+    };
+    this._superheroes.update(list => [...list, hero]);
+    return of({ ...hero }).pipe(delay(DELAY_MS));
   }
 }
 
