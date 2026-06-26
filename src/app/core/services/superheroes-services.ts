@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { Superheroe } from '../../shared/models/superheroe';
-import { delay, Observable, of, throwError } from 'rxjs';
+import { delay, Observable, of, tap, throwError } from 'rxjs';
 
 //Simular latencia del backend
 const DELAY_MS = 400;
@@ -128,6 +128,18 @@ export class SuperheroesServices {
     });
 
     return of(updated).pipe(delay(DELAY_MS));
+  }
+
+  //Eliminar un superheroe por su id
+  delete(id: number): Observable<void> {
+    const exists = this._superheroes().some(h => h.id === id);
+    if (!exists) {
+      return throwError(() => new Error(`Superhéroe con id "${id}" no encontrado`));
+    }
+    return of(undefined).pipe(
+      delay(DELAY_MS),
+      tap(() => this._superheroes.update(list => list.filter(h => h.id !== id))),
+    );
   }
 }
 
