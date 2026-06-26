@@ -53,6 +53,20 @@
   .heroes-table {
     width: 100%;
 
+    .hero-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .hero-avatar {
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
     .hero-name {
       font-weight: 600;
       letter-spacing: 0.5px;

@@ -14,6 +14,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 
 import { SuperheroesServices } from '../../../../core/services/superheroes-services';
@@ -40,11 +41,17 @@ import { Superheroe } from '../../../../shared/models/superheroe';
 })
 export class SuperheroeListComponent implements OnInit, OnDestroy {
   private readonly heroesService = inject(SuperheroesServices);
+  private readonly router = inject(Router);
 
   private readonly destroy$ = new Subject<void>();
 
   readonly dataSource = new MatTableDataSource<Superheroe>();
   readonly displayedColumns = ['name', 'realName', 'universe', 'year'];
+  readonly defaultImg = 'assets/images/hero-placeholder.svg';
+
+  onImgError(event: Event): void {
+    (event.target as HTMLImageElement).src = this.defaultImg;
+  }
 
   ngOnInit(): void {
     this.loadHeroes();
@@ -61,5 +68,9 @@ export class SuperheroeListComponent implements OnInit, OnDestroy {
       .subscribe(heroes => {
         this.dataSource.data = heroes;
       });
+  }
+
+  navigateToCreate(): void {
+    this.router.navigate(['/superheroes/new']);
   }
 }

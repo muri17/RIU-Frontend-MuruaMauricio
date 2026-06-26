@@ -6,6 +6,10 @@
       <mat-icon class="hero-icon">auto_awesome</mat-icon>
       <h1>Superhéroes</h1>
     </div>
+    <button mat-flat-button color="primary" (click)="navigateToCreate()">
+      <mat-icon>add</mat-icon>
+      Nuevo héroe
+    </button>
   </div>
 
   <!-- Table -->
@@ -18,7 +22,10 @@
           <ng-container matColumnDef="name">
             <th mat-header-cell *matHeaderCellDef>Nombre</th>
             <td mat-cell *matCellDef="let hero">
-              <span class="hero-name">{{ hero.name }}</span>
+              <div class="hero-cell">
+                <img class="hero-avatar" [src]="hero.img || defaultImg" [alt]="hero.name" (error)="onImgError($event)" />
+                <span class="hero-name">{{ hero.name }}</span>
+              </div>
             </td>
           </ng-container>
 

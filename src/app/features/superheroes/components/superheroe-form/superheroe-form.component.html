@@ -1,0 +1,87 @@
+<div class="page-container">
+  <mat-card class="form-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>add_circle</mat-icon>
+        Nuevo héroe
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div class="form-grid">
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre del héroe</mat-label>
+            <mat-icon matPrefix>star</mat-icon>
+            <input id="name" aria-label="Nombre del héroe" matInput formControlName="name" placeholder="Ej: SPIDERMAN" autocomplete="off" />
+            @if (form.get('name')?.touched && form.get('name')?.hasError('required')) {
+              <mat-error>El nombre es obligatorio</mat-error>
+            }
+            @if (form.get('name')?.touched && form.get('name')?.hasError('minlength')) {
+              <mat-error>Mínimo 2 caracteres</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre real</mat-label>
+            <mat-icon matPrefix>person</mat-icon>
+            <input id="realName" aria-label="Nombre real" matInput formControlName="realName" placeholder="Ej: Peter Parker" />
+            @if (form.get('realName')?.touched && form.get('realName')?.hasError('required')) {
+              <mat-error>El nombre real es obligatorio</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Universo</mat-label>
+            <mat-icon matPrefix>business</mat-icon>
+            <mat-select formControlName="universe">
+              @for (u of universe; track u) {
+                <mat-option [value]="u">{{ u }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Año de 1ª aparición</mat-label>
+            <mat-icon matPrefix>calendar_today</mat-icon>
+            <input id="year" aria-label="Año de primera aparición" matInput formControlName="year" placeholder="Ej: 1962" maxlength="4" />
+            @if (form.get('year')?.touched && form.get('year')?.hasError('required')) {
+              <mat-error>El año es obligatorio</mat-error>
+            }
+            @if (form.get('year')?.touched && form.get('year')?.hasError('pattern')) {
+              <mat-error>Ingresá un año válido (4 dígitos)</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Poderes (separados por coma)</mat-label>
+            <mat-icon matPrefix>bolt</mat-icon>
+            <input id="powers" aria-label="Poderes" matInput formControlName="powers" placeholder="Ej: Vuelo, Superfuerza, Invisibilidad" />
+            @if (form.get('powers')?.touched && form.get('powers')?.hasError('required')) {
+              <mat-error>Agrega al menos un poder</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>URL de imagen (opcional)</mat-label>
+            <mat-icon matPrefix>image</mat-icon>
+            <input id="img" aria-label="URL de imagen" matInput formControlName="img" placeholder="https://..." />
+          </mat-form-field>
+
+        </div>
+
+        <div class="form-actions">
+          <button mat-stroked-button type="button" (click)="goBack()">
+            <mat-icon>arrow_back</mat-icon>
+            Cancelar
+          </button>
+          <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
+            <mat-icon>add</mat-icon>
+            Crear héroe
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
