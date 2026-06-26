@@ -26,6 +26,14 @@ export const routes: Routes = [
         title: 'Nuevo héroe',
       },
       {
+        path: 'edit/:id',
+        loadComponent: () =>
+          import(
+            './features/superheroes/components/superheroe-form/superheroe-form.component'
+          ).then(m => m.SuperheroeFormComponent),
+        title: 'Editar héroe',
+      },
+      {
         path: 'detail/:id',
         loadComponent: () =>
           import(

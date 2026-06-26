@@ -2,8 +2,8 @@
   <mat-card class="form-card">
     <mat-card-header>
       <mat-card-title>
-        <mat-icon>{{ isViewMode() ? 'visibility' : 'add_circle' }}</mat-icon>
-        {{ isViewMode() ? 'Detalle héroe' : 'Nuevo héroe' }}
+        <mat-icon>{{ isViewMode() ? 'visibility' : isEditMode() ? 'edit' : 'add_circle' }}</mat-icon>
+        {{ isViewMode() ? 'Detalle héroe' : isEditMode() ? 'Editar héroe' : 'Nuevo héroe' }}
       </mat-card-title>
     </mat-card-header>
 
@@ -78,8 +78,8 @@
           </button>
           @if (!isViewMode()) {
             <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
-              <mat-icon>add</mat-icon>
-              Crear héroe
+              <mat-icon>{{ isEditMode() ? 'edit' : 'add' }}</mat-icon>
+              {{ isEditMode() ? 'Actualizar héroe' : 'Crear héroe' }}
             </button>
           }
         </div>

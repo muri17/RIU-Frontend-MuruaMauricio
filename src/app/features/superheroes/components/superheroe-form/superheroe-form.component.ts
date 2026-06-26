@@ -48,6 +48,7 @@ export class SuperheroeFormComponent implements OnInit {
 
   readonly universe = ['Marvel', 'DC', 'Other'] as const;
 
+  readonly isEditMode = signal(false);
   readonly isViewMode = signal(false);
 
   form!: FormGroup;
@@ -58,9 +59,15 @@ export class SuperheroeFormComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     const path = this.route.snapshot.routeConfig?.path ?? '';
 
-    if (id && path.startsWith('detail')) {
-      this.isViewMode.set(true);
-      this.loadHeroe(Number.parseInt(id));
+    if (id) {
+      const numId = Number.parseInt(id);
+      this.loadHeroe(numId);
+
+      if (path.startsWith('detail')) {
+        this.isViewMode.set(true);
+      } else {
+        this.isEditMode.set(true);
+      }
     }
   }
 
@@ -108,9 +115,18 @@ export class SuperheroeFormComponent implements OnInit {
       .map((p: string) => p.trim())
       .filter(Boolean);
 
-    this.heroesService.create({ ...raw, powers }).subscribe({
+    const id = this.isEditMode() ? this.route.snapshot.paramMap.get('id') : null;
+    const action$ = id
+      ? this.heroesService.update(Number.parseInt(id), { ...raw, powers })
+      : this.heroesService.create({ ...raw, powers });
+
+    action$.subscribe({
       next: () => {
-        this.snackBar.open('Héroe creado ✓', 'OK', { duration: 2500 });
+        this.snackBar.open(
+          this.isEditMode() ? 'Héroe actualizado ✓' : 'Héroe creado ✓',
+          'OK',
+          { duration: 2500 },
+        );
         this.goBack();
       },
       error: (err: Error) =>

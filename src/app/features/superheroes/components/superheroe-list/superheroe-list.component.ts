@@ -74,6 +74,10 @@ export class SuperheroeListComponent implements OnInit, OnDestroy {
     this.router.navigate(['/superheroes/new']);
   }
 
+  navigateToEdit(heroe: Superheroe): void {
+    this.router.navigate(['/superheroes/edit', heroe.id]);
+  }
+
   navigateToDetail(heroe: Superheroe): void {
     this.router.navigate(['/superheroes/detail', heroe.id]);
   }
