@@ -8,6 +8,7 @@ import {
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,13 +18,14 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { debounceTime, distinctUntilChanged, Subject, switchMap, takeUntil } from 'rxjs';
+import { debounceTime, distinctUntilChanged, finalize, Subject, switchMap, takeUntil } from 'rxjs';
 
 import { SuperheroesServices } from '../../services/superheroes-services';
 import { Superheroe } from '../../../../shared/models/superheroe';
 import { SuperheroeDeleteDialogComponent } from '../superheroe-delete-dialog/superheroe-delete-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { LoadingService } from '../../../../core/services/loading-service';
 
 
 @Component({
@@ -41,6 +43,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     MatChipsModule,
     MatTooltipModule,
     MatPaginatorModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './superheroe-list.component.html',
   styleUrls: ['./superheroe-list.component.scss'],
@@ -52,6 +55,7 @@ export class SuperheroeListComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  readonly loadingService = inject(LoadingService);
 
   private readonly destroy$ = new Subject<void>();
 
@@ -80,11 +84,11 @@ export class SuperheroeListComponent implements OnInit, OnDestroy {
 
   //Cargar la lista de superhéroes desde el servicio
   private loadHeroes(): void {
+    this.loadingService.show();
     this.heroesService
       .getAll()
-      .subscribe(heroes => {
-        this.applyData(heroes);
-      });
+      .pipe(finalize(() => this.loadingService.hide()))
+      .subscribe(heroes => this.applyData(heroes));
   }
 
   //Buscar superhéroes por nombre y actualizar la lista
@@ -94,10 +98,11 @@ export class SuperheroeListComponent implements OnInit, OnDestroy {
         debounceTime(300),
         distinctUntilChanged(),
         switchMap(query => {
+          this.loadingService.show();
           const source$ = query?.trim()
             ? this.heroesService.searchByName(query.trim())
             : this.heroesService.getAll();
-          return source$;
+          return source$.pipe(finalize(() => this.loadingService.hide()));
         }),
         takeUntil(this.destroy$),
       )

@@ -32,6 +32,11 @@
 
   <!-- Table -->
   <mat-card class="table-card">
+    @if (loadingService.isLoading()) {
+      <div class="loading-overlay">
+        <mat-spinner diameter="56" />
+      </div>
+    }
     <mat-card-content>
       <div class="table-wrapper">
         <table mat-table [dataSource]="dataSource" class="heroes-table">

@@ -77,9 +77,15 @@
             {{ isViewMode() ? 'Volver' : 'Cancelar' }}
           </button>
           @if (!isViewMode()) {
-            <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
-              <mat-icon>{{ isEditMode() ? 'edit' : 'add' }}</mat-icon>
-              {{ isEditMode() ? 'Actualizar héroe' : 'Crear héroe' }}
+            <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || loadingService.isLoading()">
+              <span class="btn-content">
+                @if (loadingService.isLoading()) {
+                  <mat-spinner diameter="18" />
+                } @else {
+                  <mat-icon>{{ isEditMode() ? 'edit' : 'add' }}</mat-icon>
+                }
+                {{ loadingService.isLoading() ? '' : isEditMode() ? 'Actualizar' : 'Crear' }}
+              </span>
             </button>
           }
         </div>

@@ -46,6 +46,19 @@
 }
 
 .table-card {
+  position: relative;
+
+  .loading-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.75);
+    z-index: 10;
+    border-radius: inherit;
+  }
+
   .table-wrapper {
     overflow-x: auto;
   }

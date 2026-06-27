@@ -19,7 +19,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { finalize } from 'rxjs';
 import { SuperheroesServices } from '../../services/superheroes-services';
+import { LoadingService } from '../../../../core/services/loading-service';
 
 
 @Component({
@@ -35,6 +38,7 @@ import { SuperheroesServices } from '../../services/superheroes-services';
     MatIconModule,
     MatCardModule,
     MatSnackBarModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './superheroe-form.component.html',
   styleUrl: './superheroe-form.component.scss',
@@ -45,6 +49,7 @@ export class SuperheroeFormComponent implements OnInit {
   private readonly heroesService = inject(SuperheroesServices);
   private readonly snackBar = inject(MatSnackBar);
   private readonly route = inject(ActivatedRoute);
+  readonly loadingService = inject(LoadingService);
 
   readonly universe = ['Marvel', 'DC', 'Other'] as const;
 
@@ -89,8 +94,10 @@ export class SuperheroeFormComponent implements OnInit {
 
   //Cargar los datos del héroe si se está en modo edición o visualización
   private loadHeroe(id: number): void {
+    this.loadingService.show();
     this.heroesService
       .getById(id)
+      .pipe(finalize(() => this.loadingService.hide()))
       .subscribe({
         next: hero => {
           this.form.patchValue({
@@ -124,20 +131,23 @@ export class SuperheroeFormComponent implements OnInit {
       ? this.heroesService.update(Number.parseInt(id), { ...raw, powers })
       : this.heroesService.create({ ...raw, powers });
 
-    action$.subscribe({
-      next: () => {
-        this.snackBar.open(
-          this.isEditMode() ? 'Héroe actualizado ✓' : 'Héroe creado ✓',
-          'OK',
-          { duration: 2500 },
-        );
-        this.goBack();
-      },
-      error: (err: Error) =>
-        this.snackBar.open(err.message ?? 'Error inesperado', 'Cerrar', {
-          duration: 4000,
-        }),
-    });
+    this.loadingService.show();
+    action$
+      .pipe(finalize(() => this.loadingService.hide()))
+      .subscribe({
+        next: () => {
+          this.snackBar.open(
+            this.isEditMode() ? 'Héroe actualizado ✓' : 'Héroe creado ✓',
+            'OK',
+            { duration: 2500 },
+          );
+          this.goBack();
+        },
+        error: (err: Error) =>
+          this.snackBar.open(err.message ?? 'Error inesperado', 'Cerrar', {
+            duration: 4000,
+          }),
+      });
   }
 
   //Obtener los mensajes de error para los campos del formulario
