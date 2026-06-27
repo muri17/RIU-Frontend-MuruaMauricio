@@ -23,6 +23,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { finalize } from 'rxjs';
 import { SuperheroesServices } from '../../services/superheroes-services';
 import { LoadingService } from '../../../../core/services/loading-service';
+import { UppercaseInputDirective } from '../../../../shared/directives/uppercase-input.directive';
+
 
 
 @Component({
@@ -39,6 +41,7 @@ import { LoadingService } from '../../../../core/services/loading-service';
     MatCardModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
+    UppercaseInputDirective
   ],
   templateUrl: './superheroe-form.component.html',
   styleUrl: './superheroe-form.component.scss',

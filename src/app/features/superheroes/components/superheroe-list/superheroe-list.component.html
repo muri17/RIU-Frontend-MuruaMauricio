@@ -21,7 +21,8 @@
       aria-label="Buscar por nombre"
       matInput
       [formControl]="searchControl"
-      placeholder="Ej: spiderman, man, thor…"
+      placeholder="Ej: SPIDERMAN, MAN, THOR..."
+      appUppercase
     />
     @if (searchControl.value) {
       <button matSuffix mat-icon-button aria-label="Limpiar búsqueda" (click)="clearSearch()">

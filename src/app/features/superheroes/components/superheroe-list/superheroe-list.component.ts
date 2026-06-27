@@ -26,6 +26,7 @@ import { SuperheroeDeleteDialogComponent } from '../superheroe-delete-dialog/sup
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { LoadingService } from '../../../../core/services/loading-service';
+import { UppercaseInputDirective } from '../../../../shared/directives/uppercase-input.directive';
 
 
 @Component({
@@ -44,6 +45,7 @@ import { LoadingService } from '../../../../core/services/loading-service';
     MatTooltipModule,
     MatPaginatorModule,
     MatProgressSpinnerModule,
+    UppercaseInputDirective
   ],
   templateUrl: './superheroe-list.component.html',
   styleUrls: ['./superheroe-list.component.scss'],
