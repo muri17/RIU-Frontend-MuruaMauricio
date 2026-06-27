@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import { Superheroe } from '../../../shared/models/superheroe';
 import { delay, Observable, of, tap, throwError } from 'rxjs';
 
@@ -86,6 +86,23 @@ export class SuperheroesServices {
 
   //Alternativa con signals para exponer la lista de héroes de manera reactiva y segura
   readonly heroes = this._superheroes.asReadonly();
+
+  //Se puede realizar una búsqueda reactiva de un héroe usando signals,
+  //sin necesidad de usar observables, este es un ejemplo de cómo se podría hacer.
+  //Simplifican la detección de cambios y evitan suscripciones manuales.
+  //En el componente usar un effect() para sincronizar con el dataSource.
+
+  //Término de búsqueda reactivo
+  readonly searchQuery = signal('');
+
+  //Lista filtrada derivada: reacciona a cambios en _superheroes y searchQuery
+  readonly filteredHeroes = computed(() => {
+    const term = this.searchQuery().trim().toUpperCase();
+    const list = this._superheroes();
+    return (term ? list.filter(h => h.name.includes(term)) : list).map(h => ({ ...h }));
+  });
+
+  //API pública (Los observables simulan una capa HTTP asincrónica)
 
   //Consultar todos los superheroes
   getAll(): Observable<Superheroe[]> {
