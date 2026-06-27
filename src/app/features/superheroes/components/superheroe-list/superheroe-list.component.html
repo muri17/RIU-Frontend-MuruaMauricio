@@ -12,6 +12,24 @@
     </button>
   </div>
 
+  <!-- Search bar -->
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>Buscar por nombre</mat-label>
+    <mat-icon matPrefix>search</mat-icon>
+    <input
+      id="heroSearch"
+      aria-label="Buscar por nombre"
+      matInput
+      [formControl]="searchControl"
+      placeholder="Ej: spiderman, man, thor…"
+    />
+    @if (searchControl.value) {
+      <button matSuffix mat-icon-button aria-label="Limpiar búsqueda" (click)="clearSearch()">
+        <mat-icon>close</mat-icon>
+      </button>
+    }
+  </mat-form-field>
+
   <!-- Table -->
   <mat-card class="table-card">
     <mat-card-content>

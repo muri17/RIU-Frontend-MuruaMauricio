@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { Superheroe } from '../../shared/models/superheroe';
+import { Superheroe } from '../../../shared/models/superheroe';
 import { delay, Observable, of, tap, throwError } from 'rxjs';
 
 //Simular latencia del backend
@@ -95,6 +95,15 @@ export class SuperheroesServices {
     return hero
       ? of({ ...hero }).pipe(delay(DELAY_MS))
       : throwError(() => new Error(`Superhéroe con id "${id}" no encontrado`));
+  }
+
+  //Buscar todos los héroes cuyo nombre contenga `query` (sin importar mayúsculas o minúsculas)
+  searchByName(query: string): Observable<Superheroe[]> {
+    const term = query.trim().toUpperCase();
+    const results = this._superheroes()
+      .filter(h => h.name.includes(term))
+      .map(h => ({ ...h }));
+    return of(results).pipe(delay(DELAY_MS));
   }
 
   //Crear un nuevo superheroe
