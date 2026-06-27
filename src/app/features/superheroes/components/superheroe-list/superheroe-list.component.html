@@ -102,9 +102,23 @@
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+            <!-- Empty state -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell empty-state" [attr.colspan]="displayedColumns.length">
+              <mat-icon>search_off</mat-icon>
+              <p>No se encontraron héroes.</p>
+            </td>
+          </tr>
         </table>
       </div>
 
+      <mat-paginator
+        [pageSizeOptions]="[5, 10, 25]"
+        [pageSize]="5"
+        showFirstLastButtons
+        aria-label="Paginación de héroes"
+      />
     </mat-card-content>
   </mat-card>
 

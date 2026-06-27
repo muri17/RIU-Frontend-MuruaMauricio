@@ -2,10 +2,12 @@ import {
   Component,
   OnInit,
   OnDestroy,
+  ViewChild,
   inject,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -38,11 +40,14 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     MatCardModule,
     MatChipsModule,
     MatTooltipModule,
+    MatPaginatorModule,
   ],
   templateUrl: './superheroe-list.component.html',
   styleUrls: ['./superheroe-list.component.scss'],
 })
 export class SuperheroeListComponent implements OnInit, OnDestroy {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
   private readonly heroesService = inject(SuperheroesServices);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
@@ -78,7 +83,7 @@ export class SuperheroeListComponent implements OnInit, OnDestroy {
     this.heroesService
       .getAll()
       .subscribe(heroes => {
-        this.dataSource.data = heroes;
+        this.applyData(heroes);
       });
   }
 
@@ -102,6 +107,10 @@ export class SuperheroeListComponent implements OnInit, OnDestroy {
   //Aplicar los datos de superhéroes a la fuente de datos de la tabla
   private applyData(heroes: Superheroe[]): void {
     this.dataSource.data = heroes;
+    // Asignar el paginador a la fuente de datos después de que se haya renderizado la vista
+    setTimeout(() => {
+      if (this.paginator) this.dataSource.paginator = this.paginator;
+    });
   }
 
   // Navegar a la página de creación de un nuevo superhéroe

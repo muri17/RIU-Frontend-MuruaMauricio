@@ -84,6 +84,9 @@ export class SuperheroesServices {
   //Variable para generar IDs únicos para nuevos héroes
   private _nextId = SEED_HEROES.length + 1;
 
+  //Alternativa con signals para exponer la lista de héroes de manera reactiva y segura
+  readonly heroes = this._superheroes.asReadonly();
+
   //Consultar todos los superheroes
   getAll(): Observable<Superheroe[]> {
       return of(this._superheroes().map(h => ({ ...h }))).pipe(delay(DELAY_MS));
