@@ -84,6 +84,9 @@ export class SuperheroesServices {
   //Variable para generar IDs únicos para nuevos héroes
   private _nextId = SEED_HEROES.length + 1;
 
+  //Propiedad computada para obtener el total de héroes
+  readonly totalHeroes = computed(() => this._superheroes().length);
+
   //Alternativa con signals para exponer la lista de héroes de manera reactiva y segura
   readonly heroes = this._superheroes.asReadonly();
 
@@ -138,7 +141,7 @@ export class SuperheroesServices {
   }
 
   //Actualizar un superheroe existente
-   update(id: number, dto: Superheroe): Observable<Superheroe> {
+  update(id: number, dto: Partial<Superheroe>): Observable<Superheroe> {
     const index = this._superheroes().findIndex(h => h.id === id);
     if (index === -1) {
       return throwError(() => new Error(`Superhéroe con id "${id}" no encontrado`));
