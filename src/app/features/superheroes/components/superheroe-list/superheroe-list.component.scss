@@ -1,37 +1,7 @@
 .list-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: flex-end;
   margin-bottom: 24px;
-
-  .title-section {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-
-    h1 {
-      margin: 0;
-      font-size: 1.8rem;
-      font-weight: 500;
-      color: #1a237e;
-    }
-
-    .hero-icon {
-      color: #ffc107;
-      font-size: 2rem;
-      width: 2rem;
-      height: 2rem;
-    }
-
-    .badge {
-      background: #e8eaf6;
-      color: #3949ab;
-      border-radius: 12px;
-      padding: 2px 10px;
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
-  }
 }
 
 .search-field {
