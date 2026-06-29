@@ -131,27 +131,25 @@ export class SuperheroeFormComponent implements OnInit {
       .filter(Boolean);
 
     const id = this.isEditMode() ? this.route.snapshot.paramMap.get('id') : null;
-    const action$ = id
-      ? this.heroesService.update(Number.parseInt(id), { ...raw, powers })
-      : this.heroesService.create({ ...raw, powers });
 
-    this.loadingService.show();
-    action$
-      .pipe(finalize(() => this.loadingService.hide()))
-      .subscribe({
-        next: () => {
-          this.snackBar.open(
-            this.isEditMode() ? 'Héroe actualizado ✓' : 'Héroe creado ✓',
-            'OK',
-            { duration: 2500 },
-          );
-          this.goBack();
-        },
-        error: (err: Error) =>
-          this.snackBar.open(err.message ?? 'Error inesperado', 'Cerrar', {
-            duration: 4000,
-          }),
-      });
+    if (id) {
+      this.loadingService.show();
+      this.heroesService
+        .update(Number.parseInt(id), { ...raw, powers })
+        .pipe(finalize(() => this.loadingService.hide()))
+        .subscribe({
+          next: () => {
+            this.snackBar.open('Héroe actualizado ✓', 'OK', { duration: 2500 });
+            this.goBack();
+          },
+          error: (err: Error) =>
+            this.snackBar.open(err.message ?? 'Error inesperado', 'Cerrar', { duration: 4000 }),
+        });
+    } else {
+      this.heroesService.create({ ...raw, powers });
+      this.snackBar.open('Héroe creado ✓', 'OK', { duration: 2500 });
+      this.goBack();
+    }
   }
 
   //Obtener los mensajes de error para los campos del formulario

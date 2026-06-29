@@ -89,21 +89,22 @@ describe('SuperheroesServices', () => {
       year: '1956',
     };
 
-    it('debe crear un superhéroes', fakeAsync(() => {
+    it('debe crear un superhéroes', () => {
       const before = service.totalHeroes();
-      service.create(dto).subscribe();
-      tick(400);
+      service.create(dto);
       expect(service.totalHeroes()).toBe(before + 1);
-    }));
+    });
 
-    it('debe asignar un id único al nuevo superhéroes', fakeAsync(() => {
-      let h1: Superheroe | undefined, h2: Superheroe   | undefined;
-      service.create({ ...dto, name: 'HERO_A' }).subscribe(h => (h1 = h));
-      tick(400);
-      service.create({ ...dto, name: 'HERO_B' }).subscribe(h => (h2 = h));
-      tick(400);
-      expect(h1!.id).not.toBe(h2!.id);
-    }));
+    it('debe asignar un id único al nuevo superhéroes', () => {
+      const h1 = service.create({ ...dto, name: 'HERO_A' });
+      const h2 = service.create({ ...dto, name: 'HERO_B' });
+      expect(h1.id).not.toBe(h2.id);
+    });
+
+    it('debe convertir el nombre a mayúsculas', () => {
+      const h = service.create({ ...dto, name: 'flash' });
+      expect(h.name).toBe('FLASH');
+    });
   });
 
   //Actualizar un heroe existente

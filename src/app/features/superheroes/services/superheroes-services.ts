@@ -129,15 +129,15 @@ export class SuperheroesServices {
     return of(results).pipe(delay(DELAY_MS));
   }
 
-  //Crear un nuevo superheroe
-  create(dto: Superheroe): Observable<Superheroe> {
+  //Crear un nuevo superheroe (sincrónico vía signal, sin delay de red ) como ejemplo de uso de signals
+  create(dto: Superheroe): Superheroe {
     const hero: Superheroe = {
       ...dto,
       id: this._nextId++,
       name: dto.name.toUpperCase(),
     };
     this._superheroes.update(list => [...list, hero]);
-    return of({ ...hero }).pipe(delay(DELAY_MS));
+    return { ...hero };
   }
 
   //Actualizar un superheroe existente
