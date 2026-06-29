@@ -9,6 +9,18 @@
 
     <mat-card-content>
       <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+        @if (isViewMode()) {
+          <div class="hero-photo-wrapper">
+            <img
+              class="hero-photo"
+              [src]="form.get('img')?.value || defaultImg"
+              [alt]="form.get('name')?.value"
+              (error)="onImgError($event)"
+            />
+          </div>
+        }
+
         <div class="form-grid">
 
           <mat-form-field appearance="outline" class="full-width">

@@ -14,6 +14,21 @@
   }
 }
 
+.hero-photo-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+
+  .hero-photo {
+    width: 280px;
+    height: 280px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

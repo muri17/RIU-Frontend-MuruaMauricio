@@ -55,6 +55,7 @@ export class SuperheroeFormComponent implements OnInit {
   readonly loadingService = inject(LoadingService);
 
   readonly universe = ['Marvel', 'DC', 'Other'] as const;
+  readonly defaultImg = 'assets/images/hero-placeholder.svg';
 
   readonly isEditMode = signal(false);
   readonly isViewMode = signal(false);
@@ -167,6 +168,10 @@ export class SuperheroeFormComponent implements OnInit {
     if (c?.hasError('required')) return 'El año es obligatorio';
     if (c?.hasError('pattern')) return 'Debe ser un año de 4 dígitos (ej: 1962)';
     return '';
+  }
+
+  onImgError(event: Event): void {
+    (event.target as HTMLImageElement).src = this.defaultImg;
   }
 
   goBack(): void {
