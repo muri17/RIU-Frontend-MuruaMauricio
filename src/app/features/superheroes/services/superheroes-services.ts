@@ -109,7 +109,8 @@ export class SuperheroesServices {
 
   //Consultar todos los superheroes
   getAll(): Observable<Superheroe[]> {
-      return of(this._superheroes().map(h => ({ ...h }))).pipe(delay(DELAY_MS));
+    const sorted = this._superheroes().map(h => ({ ...h })).sort((a, b) => a.name.localeCompare(b.name));
+    return of(sorted).pipe(delay(DELAY_MS));
   }
 
   //Consultar un superheroe por su id
@@ -125,7 +126,8 @@ export class SuperheroesServices {
     const term = query.trim().toUpperCase();
     const results = this._superheroes()
       .filter(h => h.name.includes(term))
-      .map(h => ({ ...h }));
+      .map(h => ({ ...h }))
+      .sort((a, b) => a.name.localeCompare(b.name));
     return of(results).pipe(delay(DELAY_MS));
   }
 
@@ -136,7 +138,7 @@ export class SuperheroesServices {
       id: this._nextId++,
       name: dto.name.toUpperCase(),
     };
-    this._superheroes.update(list => [...list, hero]);
+    this._superheroes.update(list => [hero, ...list]);
     return { ...hero };
   }
 
