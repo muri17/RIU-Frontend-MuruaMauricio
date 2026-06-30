@@ -62,7 +62,6 @@ export class SuperheroeFormComponent implements OnInit {
 
   form!: FormGroup;
 
-  //Inicializar el componente y determinar si se está en modo creación, edición o visualización
   ngOnInit(): void {
     this.buildForm();
 
@@ -81,7 +80,6 @@ export class SuperheroeFormComponent implements OnInit {
     }
   }
 
-  //Inicializar el fromulario con los campos y validaciones necesarias
   private buildForm(): void {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
@@ -96,7 +94,6 @@ export class SuperheroeFormComponent implements OnInit {
     });
   }
 
-  //Cargar los datos del héroe si se está en modo edición o visualización
   private loadHeroe(id: number): void {
     this.loadingService.show();
     this.heroesService
@@ -117,7 +114,6 @@ export class SuperheroeFormComponent implements OnInit {
       });
   }
 
-  //Enviar el formulario para crear o actualizar un héroe
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -170,6 +166,7 @@ export class SuperheroeFormComponent implements OnInit {
     return '';
   }
 
+  //Mostrar imagen default si la imagen del superheroe no carga
   onImgError(event: Event): void {
     (event.target as HTMLImageElement).src = this.defaultImg;
   }

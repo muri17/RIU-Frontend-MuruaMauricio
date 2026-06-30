@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   OnInit,
   OnDestroy,
@@ -50,7 +51,7 @@ import { UppercaseInputDirective } from '../../../../shared/directives/uppercase
   templateUrl: './superheroe-list.component.html',
   styleUrls: ['./superheroe-list.component.scss'],
 })
-export class SuperheroeListComponent implements OnInit, OnDestroy {
+export class SuperheroeListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   private readonly heroesService = inject(SuperheroesServices);
@@ -72,19 +73,20 @@ export class SuperheroeListComponent implements OnInit, OnDestroy {
     (event.target as HTMLImageElement).src = this.defaultImg;
   }
 
-  //Inicializar el componente y cargar la lista de superhéroes
   ngOnInit(): void {
     this.loadHeroes();
     this.listenToSearch();
   }
 
-  //Destruir el componente y limpiar los recursos
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  //Cargar la lista de superhéroes desde el servicio
   private loadHeroes(): void {
     this.loadingService.show();
     this.heroesService
@@ -93,7 +95,6 @@ export class SuperheroeListComponent implements OnInit, OnDestroy {
       .subscribe(heroes => this.applyData(heroes));
   }
 
-  //Buscar superhéroes por nombre y actualizar la lista
   private listenToSearch(): void {
     this.searchControl.valueChanges
       .pipe(
@@ -111,31 +112,22 @@ export class SuperheroeListComponent implements OnInit, OnDestroy {
       .subscribe(heroes => this.applyData(heroes));
   }
 
-  //Aplicar los datos de superhéroes a la fuente de datos de la tabla
   private applyData(heroes: Superheroe[]): void {
     this.dataSource.data = heroes;
-    // Asignar el paginador a la fuente de datos después de que se haya renderizado la vista
-    setTimeout(() => {
-      if (this.paginator) this.dataSource.paginator = this.paginator;
-    });
   }
 
-  // Navegar a la página de creación de un nuevo superhéroe
   navigateToCreate(): void {
     this.router.navigate(['/superheroes/new']);
   }
 
-  // Navegar a la página de edición de un superhéroe existente
   navigateToEdit(heroe: Superheroe): void {
     this.router.navigate(['/superheroes/edit', heroe.id]);
   }
 
-  // Navegar a la página de detalle de un superhéroe
   navigateToDetail(heroe: Superheroe): void {
     this.router.navigate(['/superheroes/detail', heroe.id]);
   }
 
-  // Abrir un diálogo de confirmación para eliminar un superhéroe
   openDeleteDialog(hero: Superheroe): void {
     const ref = this.dialog.open(SuperheroeDeleteDialogComponent, {
       data: { heroName: hero.name },
@@ -160,7 +152,6 @@ export class SuperheroeListComponent implements OnInit, OnDestroy {
       });
   }
 
-  // Limpiar el campo de búsqueda y mostrar todos los superhéroes
   clearSearch(): void {
     this.searchControl.setValue('');
   }
