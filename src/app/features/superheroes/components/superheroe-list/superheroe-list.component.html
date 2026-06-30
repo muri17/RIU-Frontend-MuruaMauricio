@@ -59,7 +59,7 @@
           <ng-container matColumnDef="universe">
             <th mat-header-cell *matHeaderCellDef>Universo</th>
             <td mat-cell *matCellDef="let hero">
-              <mat-chip [class]="'universe-' + hero.universe.toUpperCase()">
+              <mat-chip [class]="'pub-' + hero.universe.toLowerCase()">
                 {{ hero.universe }}
               </mat-chip>
             </td>
