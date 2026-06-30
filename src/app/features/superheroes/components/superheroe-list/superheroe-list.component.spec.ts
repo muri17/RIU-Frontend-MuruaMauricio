@@ -1,8 +1,6 @@
 import {
   ComponentFixture,
   TestBed,
-  fakeAsync,
-  tick,
 } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -57,34 +55,42 @@ describe('SuperheroeListComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('debe cargar todos los superhéroes al iniciar', fakeAsync(() => {
-    tick(400);
-    fixture.detectChanges();
+  it('debe cargar todos los superhéroes al iniciar', () => {
     expect(heroesServiceSpy.getAll).toHaveBeenCalledOnce();
     expect(component.dataSource.data.length).toBe(3);
-  }));
+  });
 
-  it('debe llamar a searchByName cuando el control de búsqueda tiene un valor', fakeAsync(() => {
-    const filtered = MOCK_HEROES.filter(h => h.name.includes('MAN'));
-    heroesServiceSpy.searchByName.mockReturnValue(of(filtered));
+  it('debe llamar a searchByName cuando el control de búsqueda tiene un valor', async () => {
+    vi.useFakeTimers();
+    try {
+      const filtered = MOCK_HEROES.filter(h => h.name.includes('MAN'));
+      heroesServiceSpy.searchByName.mockReturnValue(of(filtered));
 
-    component.searchControl.setValue('man');
-    tick(350); // debounce
-    fixture.detectChanges();
+      component.searchControl.setValue('man');
+      await vi.advanceTimersByTimeAsync(350);
+      fixture.detectChanges();
 
-    expect(heroesServiceSpy.searchByName).toHaveBeenCalledWith('man');
-  }));
+      expect(heroesServiceSpy.searchByName).toHaveBeenCalledWith('man');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 
-  it('debe llamar a getAll cuando se limpia la búsqueda', fakeAsync(() => {
-    component.searchControl.setValue('man');
-    tick(350);
+  it('debe llamar a getAll cuando se limpia la búsqueda', async () => {
+    vi.useFakeTimers();
+    try {
+      component.searchControl.setValue('man');
+      await vi.advanceTimersByTimeAsync(350);
 
-    heroesServiceSpy.getAll.mockClear();
-    component.clearSearch();
-    tick(350);
+      heroesServiceSpy.getAll.mockClear();
+      component.clearSearch();
+      await vi.advanceTimersByTimeAsync(350);
 
-    expect(heroesServiceSpy.getAll).toHaveBeenCalled();
-  }));
+      expect(heroesServiceSpy.getAll).toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 
   it('debe abrir el diálogo de eliminación cuando se llama a openDeleteDialog', () => {
     const mockRef = { afterClosed: () => of(false) } as unknown as MatDialogRef<unknown>;
@@ -95,23 +101,21 @@ describe('SuperheroeListComponent', () => {
     expect(dialogSpy.open).toHaveBeenCalledOnce();
   });
 
-  it('debe llamar a delete con el ID del superhéroes cuando se confirma el diálogo', fakeAsync(() => {
+  it('debe llamar a delete con el ID del superhéroes cuando se confirma el diálogo', () => {
     const mockRef = { afterClosed: () => of(true) } as unknown as MatDialogRef<unknown>;
     dialogSpy.open.mockReturnValue(mockRef);
 
     component.openDeleteDialog(MOCK_HEROES[0]);
-    tick(400);
 
     expect(heroesServiceSpy.delete).toHaveBeenCalledWith(1);
-  }));
+  });
 
-  it('debe NO llamar a delete cuando se cancela el diálogo', fakeAsync(() => {
+  it('debe NO llamar a delete cuando se cancela el diálogo', () => {
     const mockRef = { afterClosed: () => of(false) } as unknown as MatDialogRef<unknown>;
     dialogSpy.open.mockReturnValue(mockRef);
 
     component.openDeleteDialog(MOCK_HEROES[0]);
-    tick(400);
 
     expect(heroesServiceSpy.delete).not.toHaveBeenCalled();
-  }));
+  });
 });
