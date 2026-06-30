@@ -1,4 +1,5 @@
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
+import { lastValueFrom } from 'rxjs';
 
 import { SuperheroesServices } from './superheroes-services';
 import { Superheroe } from '../../../shared/models/superheroe';
@@ -17,68 +18,50 @@ describe('SuperheroesServices', () => {
 
   //Obtener todos los heroes
   describe('getAll()', () => {
-    it('debe devolver todos los superhéroes', fakeAsync(() => {
-      let heroes: Superheroe[] = [];
-      service.getAll().subscribe(h => (heroes = h));
-      tick(400);
+    it('debe devolver todos los superhéroes', async () => {
+      const heroes = await lastValueFrom(service.getAll());
       expect(heroes.length).toBeGreaterThan(0);
-    }));
+    });
 
-    it('debe devolver una copia, no la referencia interna', fakeAsync(() => {
-      let heroes: Superheroe[] = [];
-      service.getAll().subscribe(h => (heroes = h));
-      tick(400);
+    it('debe devolver una copia, no la referencia interna', async () => {
+      const heroes = await lastValueFrom(service.getAll());
       heroes[0].name = 'MUTATED';
-      let fresh: Superheroe[] = [];
-      service.getAll().subscribe(h => (fresh = h));
-      tick(400);
+      const fresh = await lastValueFrom(service.getAll());
       expect(fresh[0].name).not.toBe('MUTATED');
-    }));
+    });
   });
 
   // Obtener un heroe por id
   describe('getById()', () => {
-    it('debe devolver el superhéroes con el id dado', fakeAsync(() => {
-      let hero: Superheroe | undefined;
-      service.getById(1).subscribe(h => (hero = h));
-      tick(400);
+    it('debe devolver el superhéroes con el id dado', async () => {
+      const hero = await lastValueFrom(service.getById(1));
       expect(hero).toBeDefined();
-      expect(hero!.id).toBe(1);
-    }));
+      expect(hero.id).toBe(1);
+    });
 
-    it('debe lanzar un error cuando el id no existe', fakeAsync(() => {
-      let errored = false;
-      service.getById(999).subscribe({ error: () => (errored = true) });
-      tick(0);
-      expect(errored).toBe(true);
-    }));
+    it('debe lanzar un error cuando el id no existe', async () => {
+      await expect(lastValueFrom(service.getById(999))).rejects.toThrow();
+    });
   });
 
   // Buscar heroes por nombre
   describe('searchByName()', () => {
-    it('debe devolver todos los superhéroes que contienen el término', fakeAsync(() => {
-      let results: Superheroe[] = [];
-      service.searchByName('man').subscribe(h => (results = h));
-      tick(400);
+    it('debe devolver todos los superhéroes que contienen el término', async () => {
+      const results = await lastValueFrom(service.searchByName('man'));
       expect(results.length).toBeGreaterThan(0);
       results.forEach(h => expect(h.name.toUpperCase()).toContain('MAN'));
-    }));
+    });
 
-    it('debe ser insensible a mayúsculas y minúsculas', fakeAsync(() => {
-      let lower: Superheroe[] = [], upper: Superheroe[] = [];
-      service.searchByName('man').subscribe(h => (lower = h));
-      tick(400);
-      service.searchByName('MAN').subscribe(h => (upper = h));
-      tick(400);
+    it('debe ser insensible a mayúsculas y minúsculas', async () => {
+      const lower = await lastValueFrom(service.searchByName('man'));
+      const upper = await lastValueFrom(service.searchByName('MAN'));
       expect(lower.length).toBe(upper.length);
-    }));
+    });
 
-    it('debe devolver un array vacío cuando no hay coincidencias', fakeAsync(() => {
-      let results: Superheroe[] = [];
-      service.searchByName('zzz_no_match').subscribe(h => (results = h));
-      tick(400);
+    it('debe devolver un array vacío cuando no hay coincidencias', async () => {
+      const results = await lastValueFrom(service.searchByName('zzz_no_match'));
       expect(results.length).toBe(0);
-    }));
+    });
   });
 
   //Crear un nuevo heroe
@@ -92,61 +75,46 @@ describe('SuperheroesServices', () => {
       year: '1956',
     };
 
-    it('debe crear un superhéroes', fakeAsync(() => {
+    it('debe crear un superhéroes', async () => {
       const before = service.totalHeroes();
-      service.create(dto).subscribe();
-      tick(400);
+      await lastValueFrom(service.create(dto));
       expect(service.totalHeroes()).toBe(before + 1);
-    }));
+    });
 
-    it('debe asignar un id único al nuevo superhéroes', fakeAsync(() => {
-      let h1: Superheroe | undefined, h2: Superheroe | undefined;
-      service.create({ ...dto, name: 'HERO_A' }).subscribe(h => (h1 = h));
-      tick(400);
-      service.create({ ...dto, name: 'HERO_B' }).subscribe(h => (h2 = h));
-      tick(400);
-      expect(h1!.id).not.toBe(h2!.id);
-    }));
+    it('debe asignar un id único al nuevo superhéroes', async () => {
+      const h1 = await lastValueFrom(service.create({ ...dto, name: 'HERO_A' }));
+      const h2 = await lastValueFrom(service.create({ ...dto, name: 'HERO_B' }));
+      expect(h1.id).not.toBe(h2.id);
+    });
   });
 
   //Actualizar un heroe existente
   describe('update()', () => {
-    it('debe actualizar los campos del superhéroes existentes', fakeAsync(() => {
-      let updated: Superheroe | undefined;
-      service.update(1, { realName: 'Kal-El' }).subscribe(h => (updated = h));
-      tick(400);
-      expect(updated!.realName).toBe('Kal-El');
-    }));
+    it('debe actualizar los campos del superhéroes existentes', async () => {
+      const updated = await lastValueFrom(service.update(1, { realName: 'Kal-El' }));
+      expect(updated.realName).toBe('Kal-El');
+    });
 
-    it('debe poner en mayúsculas el nombre al actualizar', fakeAsync(() => {
-      let updated: Superheroe | undefined;
-      service.update(1, { name: 'superclark' }).subscribe(h => (updated = h));
-      tick(400);
-      expect(updated!.name).toBe('SUPERCLARK');
-    }));
+    it('debe poner en mayúsculas el nombre al actualizar', async () => {
+      const updated = await lastValueFrom(service.update(1, { name: 'superclark' }));
+      expect(updated.name).toBe('SUPERCLARK');
+    });
 
-    it('debe mostrar un error cuando el id no existe', fakeAsync(() => {
-      let errored = false;
-      service.update(999, { realName: 'X' }).subscribe({ error: () => (errored = true) });
-      tick(0);
-      expect(errored).toBe(true);
-    }));
+    it('debe mostrar un error cuando el id no existe', async () => {
+      await expect(lastValueFrom(service.update(999, { realName: 'X' }))).rejects.toThrow();
+    });
   });
 
   //Eliminar un heroe existente
   describe('delete()', () => {
-    it('debe eliminar el superhéroes', fakeAsync(() => {
+    it('debe eliminar el superhéroes', async () => {
       const before = service.totalHeroes();
-      service.delete(1).subscribe();
-      tick(400);
+      await lastValueFrom(service.delete(1));
       expect(service.totalHeroes()).toBe(before - 1);
-    }));
+    });
 
-    it('debe mostrar un error cuando el id no existe', fakeAsync(() => {
-      let errored = false;
-      service.delete(999).subscribe({ error: () => (errored = true) });
-      tick(0);
-      expect(errored).toBe(true);
-    }));
+    it('debe mostrar un error cuando el id no existe', async () => {
+      await expect(lastValueFrom(service.delete(999))).rejects.toThrow();
+    });
   });
 });

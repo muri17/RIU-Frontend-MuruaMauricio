@@ -72,6 +72,6 @@ describe('SuperheroeDeleteDialogComponent', () => {
     cancelBtn!.nativeElement.click();
     fixture.detectChanges();
 
-    expect(dialogRefSpy.close).toHaveBeenCalledWith(undefined);
+    expect(dialogRefSpy.close).toHaveBeenCalledWith('');
   });
 });
