@@ -87,33 +87,13 @@ export class SuperheroesServices {
   //Propiedad computada para obtener el total de héroes
   readonly totalHeroes = computed(() => this._superheroes().length);
 
-  //Alternativa con signals para exponer la lista de héroes de manera reactiva y segura
-  readonly heroes = this._superheroes.asReadonly();
-
-  //Se puede realizar una búsqueda reactiva de un héroe usando signals,
-  //sin necesidad de usar observables, este es un ejemplo de cómo se podría hacer.
-  //Simplifican la detección de cambios y evitan suscripciones manuales.
-  //En el componente usar un effect() para sincronizar con el dataSource.
-
-  //Término de búsqueda reactivo
-  readonly searchQuery = signal('');
-
-  //Lista filtrada derivada: reacciona a cambios en _superheroes y searchQuery
-  readonly filteredHeroes = computed(() => {
-    const term = this.searchQuery().trim().toUpperCase();
-    const list = this._superheroes();
-    return (term ? list.filter(h => h.name.includes(term)) : list).map(h => ({ ...h }));
-  });
-
   //API pública (Los observables simulan una capa HTTP asincrónica)
 
-  //Consultar todos los superheroes
   getAll(): Observable<Superheroe[]> {
     const sorted = this._superheroes().map(h => ({ ...h })).sort((a, b) => a.name.localeCompare(b.name));
     return of(sorted).pipe(delay(DELAY_MS));
   }
 
-  //Consultar un superheroe por su id
   getById(id: number): Observable<Superheroe> {
     const hero = this._superheroes().find(h => h.id === id);
     return hero
@@ -131,7 +111,6 @@ export class SuperheroesServices {
     return of(results).pipe(delay(DELAY_MS));
   }
 
-  //Crear un nuevo superheroe
   create(dto: Superheroe): Observable<Superheroe> {
     const hero: Superheroe = {
       ...dto,
@@ -142,7 +121,6 @@ export class SuperheroesServices {
     return of({ ...hero }).pipe(delay(DELAY_MS));
   }
 
-  //Actualizar un superheroe existente
   update(id: number, dto: Partial<Superheroe>): Observable<Superheroe> {
     const index = this._superheroes().findIndex(h => h.id === id);
     if (index === -1) {
@@ -164,7 +142,6 @@ export class SuperheroesServices {
     return of(updated).pipe(delay(DELAY_MS));
   }
 
-  //Eliminar un superheroe por su id
   delete(id: number): Observable<void> {
     const exists = this._superheroes().some(h => h.id === id);
     if (!exists) {

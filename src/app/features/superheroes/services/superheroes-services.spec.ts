@@ -29,7 +29,10 @@ describe('SuperheroesServices', () => {
       service.getAll().subscribe(h => (heroes = h));
       tick(400);
       heroes[0].name = 'MUTATED';
-      expect(service.heroes()[0].name).not.toBe('MUTATED');
+      let fresh: Superheroe[] = [];
+      service.getAll().subscribe(h => (fresh = h));
+      tick(400);
+      expect(fresh[0].name).not.toBe('MUTATED');
     }));
   });
 
