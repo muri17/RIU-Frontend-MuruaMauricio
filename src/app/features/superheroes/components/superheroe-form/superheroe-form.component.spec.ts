@@ -1,7 +1,6 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { of, throwError } from 'rxjs';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
@@ -38,16 +37,16 @@ describe('SuperheroeFormComponent', () => {
     update: ReturnType<typeof vi.fn>;
   };
   let routerSpy: { navigate: ReturnType<typeof vi.fn> };
-  let snackBarSpy: { open: ReturnType<typeof vi.fn> };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let snackBarSpy: { open: any };
 
   async function setup(routeStub: ReturnType<typeof buildRoute>) {
     heroesServiceSpy = {
       getById: vi.fn().mockReturnValue(of(MOCK_HERO)),
-      create: vi.fn().mockReturnValue(MOCK_HERO),
+      create: vi.fn().mockReturnValue(of(MOCK_HERO)),
       update: vi.fn().mockReturnValue(of(MOCK_HERO)),
     };
     routerSpy = { navigate: vi.fn() };
-    snackBarSpy = { open: vi.fn() };
 
     await TestBed.configureTestingModule({
       imports: [SuperheroeFormComponent],
@@ -56,13 +55,17 @@ describe('SuperheroeFormComponent', () => {
         { provide: SuperheroesServices, useValue: heroesServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: ActivatedRoute, useValue: routeStub },
-        { provide: MatSnackBar, useValue: snackBarSpy },
         LoadingService,
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SuperheroeFormComponent);
     component = fixture.componentInstance;
+
+    // Spy on the exact MatSnackBar instance stored in the component's private field
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    snackBarSpy = { open: vi.spyOn((component as any).snackBar, 'open').mockReturnValue(undefined) };
+
     fixture.detectChanges();
   }
 
@@ -131,46 +134,35 @@ describe('SuperheroeFormComponent', () => {
       expect(component.isEditMode()).toBe(true);
     });
 
-    it('debe cargar el héroe por id al iniciar', fakeAsync(() => {
-      tick(400);
+    it('debe cargar el héroe por id al iniciar', () => {
       expect(heroesServiceSpy.getById).toHaveBeenCalledWith(1);
-    }));
+    });
 
-    it('debe parchear el formulario con los datos del héroe', fakeAsync(() => {
-      tick(400);
+    it('debe parchear el formulario con los datos del héroe', () => {
       fixture.detectChanges();
       expect(component.form.get('name')?.value).toBe('SUPERMAN');
       expect(component.form.get('realName')?.value).toBe('Clark Kent');
-    }));
+    });
 
-    it('debe llamar update con el id y los datos al guardar', fakeAsync(() => {
-      tick(400);
-      fixture.detectChanges();
+    it('debe llamar update con el id y los datos al guardar', () => {
       component.form.patchValue({ realName: 'Kal-El' });
       component.onSubmit();
-      tick(400);
       expect(heroesServiceSpy.update).toHaveBeenCalledWith(
         1,
         expect.objectContaining({ realName: 'Kal-El' }),
       );
-    }));
+    });
 
-    it('debe navegar de vuelta al guardar con éxito', fakeAsync(() => {
-      tick(400);
-      fixture.detectChanges();
+    it('debe navegar de vuelta al guardar con éxito', () => {
       component.onSubmit();
-      tick(400);
       expect(routerSpy.navigate).toHaveBeenCalledWith(['/superheroes']);
-    }));
+    });
 
-    it('debe mostrar snackbar de error cuando update falla', fakeAsync(() => {
+    it('debe mostrar snackbar de error cuando update falla', () => {
       heroesServiceSpy.update.mockReturnValue(throwError(() => new Error('Error de red')));
-      tick(400);
-      fixture.detectChanges();
       component.onSubmit();
-      tick(0);
       expect(snackBarSpy.open).toHaveBeenCalledWith('Error de red', 'Cerrar', { duration: 4000 });
-    }));
+    });
   });
 
   // Consultar
@@ -182,11 +174,9 @@ describe('SuperheroeFormComponent', () => {
       expect(component.isViewMode()).toBe(true);
     });
 
-    it('debe deshabilitar el formulario en modo vista', fakeAsync(() => {
-      tick(400);
-      fixture.detectChanges();
+    it('debe deshabilitar el formulario en modo vista', () => {
       expect(component.form.disabled).toBe(true);
-    }));
+    });
   });
 
   describe('getById devuelve error', () => {
@@ -198,7 +188,6 @@ describe('SuperheroeFormComponent', () => {
         update: vi.fn(),
       };
       routerSpy = { navigate: vi.fn() };
-      snackBarSpy = { open: vi.fn() };
 
       await TestBed.configureTestingModule({
         imports: [SuperheroeFormComponent],
@@ -207,13 +196,16 @@ describe('SuperheroeFormComponent', () => {
           { provide: SuperheroesServices, useValue: heroesServiceSpy },
           { provide: Router, useValue: routerSpy },
           { provide: ActivatedRoute, useValue: route },
-          { provide: MatSnackBar, useValue: snackBarSpy },
           LoadingService,
         ],
       }).compileComponents();
 
       fixture = TestBed.createComponent(SuperheroeFormComponent);
       component = fixture.componentInstance;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      snackBarSpy = { open: vi.spyOn((component as any).snackBar, 'open').mockReturnValue(undefined) };
+
       fixture.detectChanges();
     });
 

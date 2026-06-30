@@ -69,14 +69,13 @@ export class SuperheroeFormComponent implements OnInit {
     const path = this.route.snapshot.routeConfig?.path ?? '';
 
     if (id) {
-      const numId = Number.parseInt(id);
-      this.loadHeroe(numId);
-
       if (path.startsWith('detail')) {
         this.isViewMode.set(true);
       } else {
         this.isEditMode.set(true);
       }
+      const numId = Number.parseInt(id);
+      this.loadHeroe(numId);
     }
   }
 
