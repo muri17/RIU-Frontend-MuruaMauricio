@@ -18,7 +18,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { debounceTime, distinctUntilChanged, finalize, Subject, switchMap, takeUntil } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, finalize, Subject, switchMap, takeUntil } from 'rxjs';
 
 import { SuperheroesServices } from '../../services/superheroes-services';
 import { Superheroe } from '../../../../shared/models/superheroe';
@@ -142,22 +142,22 @@ export class SuperheroeListComponent implements OnInit, OnDestroy {
       width: '380px',
     });
 
-    ref.afterClosed().subscribe(confirmed => {
-      if (!confirmed) return;
-
-      this.heroesService
-        .delete(hero.id)
-        .subscribe({
-          next: () => {
-            this.snackBar.open(`${hero.name} eliminado`, 'OK', { duration: 2500 });
-            this.loadHeroes();
-          },
-          error: (err: Error) =>
-            this.snackBar.open(err.message ?? 'Error al eliminar', 'Cerrar', {
-              duration: 4000,
-            }),
-        });
-    });
+    ref.afterClosed()
+      .pipe(
+        filter(confirmed => !!confirmed),
+        switchMap(() => this.heroesService.delete(hero.id)),
+        takeUntil(this.destroy$),
+      )
+      .subscribe({
+        next: () => {
+          this.snackBar.open(`${hero.name} eliminado`, 'OK', { duration: 2500 });
+          this.loadHeroes();
+        },
+        error: (err: Error) =>
+          this.snackBar.open(err.message ?? 'Error al eliminar', 'Cerrar', {
+            duration: 4000,
+          }),
+      });
   }
 
   // Limpiar el campo de búsqueda y mostrar todos los superhéroes
